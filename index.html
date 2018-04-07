@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>js final 1</title>
+        <style>
+            canvas {
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                background-color: white;
+            }
+        </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/prototype/1.7.3.0/prototype.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/scriptaculous.js"></script>
+
+        <!--Backup scriptaculous for testing offline-->
+        <script src="scriptaculous/prototype.js"></script>
+        <script src="scriptaculous/scriptaculous.js"></script>
+    </head>
+    <body>
+        <canvas id="screen_canvas"></canvas>
+        <script>
+            var canvas = document.getElementById("screen_canvas");
+            var ctx = canvas.getContext("2d");
+            canvas.width = 4096;
+            canvas.height = 2048;
+            canvas.style.width = window.innerWidth + "px";
+            canvas.style.height = window.innerHeight + "px";
+
+            const ELEMENT = {
+                WIDTH: {
+                    DEFAULT: canvas.width * 0.375,
+                    EXPANDED: canvas.width * 0.75,
+                    SHRUNK: canvas.width * 0.2
+                },
+                OFFSET: canvas.width * 0.03125,
+                OPACITY: {
+                    DEFAULT: 0.5,
+                    EXPANDED: 0.1,
+                    SHRUNK: 0.9
+                },
+            }
+            const COVER_BOTTOM_OFFSET = ELEMENT.WIDTH.DEFAULT / 2;
+
+            function Clear_Screen () {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            function Record_Screen () {
+                var im = new Image();
+                im.src = canvas.toDataURL();
+                Clear_Screen();
+                return im;
+            }
+            class Screen_Cover {
+                constructor (id, index, image) {
+                    this.element = document.createElement("div");
+                    this.element.style.display = "inline";
+                    this.element.height = canvas.height;
+                    this.element.style.width = ELEMENT.WIDTH.DEFAULT + "px";
+                    this.element.style.height = this.element.height + "px";
+                    this.element.style.left = (index * (ELEMENT.WIDTH.DEFAULT + ELEMENT.OFFSET)) + "px";
+                    this.element.style.opacity = ELEMENT.OPACITY.DEFAULT;
+
+                    this.start_width = this.element.width;
+                    this.start_left = this.element.left;
+
+                    this.element.top = 0;
+                    this.image = image;
+                    this.element.setAttribute("id", id);
+                    document.body.appendChild(this.element);
+                }
+                set_clip () {
+                    this.element.width = parseInt(this.element.style.width);
+                    this.element.left = parseInt(this.element.style.left);
+                    ctx.beginPath();
+                    ctx.moveTo(this.element.left, this.element.top);
+                    ctx.lineTo(this.element.left + this.element.width, this.element.top);
+                    ctx.lineTo(this.element.left + this.element.width - COVER_BOTTOM_OFFSET,
+                        this.element.top + this.element.height);
+                    ctx.lineTo(this.element.left - COVER_BOTTOM_OFFSET,
+                        this.element.top + this.element.height);
+                    ctx.closePath();
+                    ctx.clip();
+                }
+                draw () {
+                    ctx.save();
+                    this.set_clip();
+                    ctx.globalAlpha = this.element.style.opacity;
+                    ctx.drawImage(this.image, 0, 0);
+                    ctx.restore();
+                }
+            }
+            function Draw_Text (text, color, position_x, position_y, rotation) {
+                ctx.save();
+                ctx.textBaseline = "hanging";
+                ctx.fillStyle = color;
+                ctx.font = "200px Arial Black";
+                ctx.translate(position_x, position_y);
+                ctx.rotate(rotation * Math.PI / 180);
+                ctx.fillText(text, 0, 0);
+                ctx.restore();
+            }
+            ctx.save();
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            Draw_Text("Breakfast", "#5522ff", 1400, 200, 0);
+            Draw_Text("Waking up is not fun", "#5522ff", 10, 1300, 0);
+            Draw_Text("I want to sleep in", "#5522ff", 200, 400, 15);
+            var breakfast_content = Record_Screen();
+            Clear_Screen();
+            ctx.restore();
+            ctx.save();
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            Draw_Text("Lunch", "#5522ff", 1800, 200, 0);
+            Draw_Text("Time to take a break", "#5522ff", 1400, 700, -15);
+            Draw_Text("Work?", "#5522ff", 1900, 1300, 5);
+            var lunch_content = Record_Screen();
+            Clear_Screen();
+            ctx.restore();
+            ctx.save();
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            Draw_Text("Dinner", "#5522ff", 2200, 200, 0);
+            Draw_Text("Eat a lot", "#5522ff", 2000, 870, 60);
+            Draw_Text("?????", "#5522ff", 2800, 600, 0);
+            var dinner_content = Record_Screen();
+            Clear_Screen();
+            ctx.restore();
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(canvas.width, 0);
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.lineTo(0, canvas.height);
+            ctx.closePath();
+            ctx.fillStyle = "#5599bb";
+            ctx.fill();
+            var breakfast_cover_color = Record_Screen();
+            ctx.fillStyle = "#336688";
+            ctx.fill();
+            var lunch_cover_color = Record_Screen();
+            ctx.fillStyle = "#003355";
+            ctx.fill();
+            var dinner_cover_color = Record_Screen();
+            ctx.fillStyle = "#5522ff";
+            ctx.fill();
+            var purple = Record_Screen();
+            ctx.fillStyle = "#ffffff";
+            ctx.fill();
+            var white = Record_Screen();
+            
+            var covers = [
+                new Screen_Cover("left_cover", 0, breakfast_cover_color),
+                new Screen_Cover("middle_cover", 1, lunch_cover_color),
+                new Screen_Cover("right_cover", 2, dinner_cover_color)
+            ];
+            var mouse_x = 0;
+            var mouse_y = 0;
+            const HOVER_STATES = {
+                LEFT: 0,
+                MIDDLE: 1,
+                RIGHT: 2
+            };
+            var hover_state = -1;
+            function Display_Foreground () {
+                Clear_Screen();
+                ctx.save();
+                covers[0].set_clip();
+                ctx.drawImage(breakfast_content, 0, 0);
+                ctx.restore();
+                ctx.save();
+                covers[1].set_clip();
+                ctx.drawImage(lunch_content, 0, 0);
+                ctx.restore();
+                ctx.save();
+                covers[2].set_clip();
+                ctx.drawImage(dinner_content, 0, 0);
+                ctx.restore();
+
+                // Draw semi-transparent covers over the content
+                covers[0].draw();
+                covers[1].draw();
+                covers[2].draw();
+
+                // Set clip for circular look-through
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(mouse_x, mouse_y);
+                ctx.arc(mouse_x, mouse_y, ELEMENT.OFFSET / 2, 0, 2 * Math.PI);
+                ctx.closePath();
+                ctx.clip();
+
+                // Draw circle clipped content
+                switch(hover_state){
+                case HOVER_STATES.LEFT:
+                    covers[0].set_clip();
+                    ctx.drawImage(breakfast_content, 0, 0);
+                    break;
+                case HOVER_STATES.MIDDLE:
+                    covers[1].set_clip();
+                    ctx.drawImage(lunch_content, 0, 0);
+                    break;
+                case HOVER_STATES.RIGHT:
+                    covers[2].set_clip();
+                    ctx.drawImage(dinner_content, 0, 0);
+                    break;
+                default:
+                    break;
+                }
+                ctx.restore();
+
+                var slope = -canvas.height / (ELEMENT.WIDTH.DEFAULT * 0.5);
+                var x = 1;
+                var y = x * slope;
+                var c = Math.sqrt(x * x + y * y);
+                x = x / c;
+                y = y / c;
+                var text_angle = Math.asin(y) * 180 / Math.PI;
+                Draw_Text("BREAKFAST", "#ffffff",
+                    covers[0].element.left + covers[0].element.width - COVER_BOTTOM_OFFSET,
+                    canvas.height * 0.75, text_angle);
+                Draw_Text("LUNCH", "#ffffff",
+                    covers[1].element.left - ELEMENT.WIDTH.DEFAULT * 0.3,
+                    canvas.height * 0.6, text_angle);
+                Draw_Text("DINNER", "#ffffff",
+                    covers[2].element.left - ELEMENT.WIDTH.DEFAULT * 0.35,
+                    canvas.height * 0.7, text_angle);
+            }
+            Display_Foreground();
+
+            function update_hover_state () {
+                function slope_equation (slope_index, x) {
+                    var x_intercept = covers[slope_index].element.left - ELEMENT.OFFSET / 2
+                    return (-canvas.height / (COVER_BOTTOM_OFFSET)) * (x - x_intercept);
+                }
+                if(mouse_y < slope_equation(1, mouse_x)){
+                    hover_state = HOVER_STATES.LEFT;
+                } else if(mouse_y < slope_equation(2, mouse_x)){
+                    hover_state = HOVER_STATES.MIDDLE;
+                } else {
+                    hover_state = HOVER_STATES.RIGHT;
+                }
+            }
+            var transform_duration = 1;
+            function Reset_Cover_Attributes (index) {
+                new Effect.Morph(covers[index].element.getAttribute("id"), {
+                    style:"width: " + ELEMENT.WIDTH.DEFAULT + "px;" + 
+                        "left: " + covers[index].start_left + "px;" + 
+                        "opacity: " + ELEMENT.OPACITY.DEFAULT + ";",
+                    duration: transform_duration});
+            }
+            function Reset_Covers () {
+                Reset_Cover_Attributes(0);
+                Reset_Cover_Attributes(1);
+                Reset_Cover_Attributes(2);
+            }
+            function Shrink_Cover (cover, offset) {
+                var id = cover.element.getAttribute("id");
+                new Effect.Morph(id,
+                {
+                    style: "width: " + ELEMENT.WIDTH.SHRUNK + "px;" + 
+                        "left: " + offset + "px;" +
+                        "opacity: " + ELEMENT.OPACITY.SHRUNK + ";",
+                    duration: transform_duration
+                });
+            }
+            function Expand_Cover (cover, offset) {
+                var id = cover.element.getAttribute("id");
+                new Effect.Morph(id,
+                {
+                    style: "width: " + ELEMENT.WIDTH.EXPANDED + "px;" + 
+                        "left: " + offset + "px;" + 
+                        "opacity: " + ELEMENT.OPACITY.EXPANDED + ";",
+                    duration: transform_duration
+                });
+            }
+            function left_shrink () {
+                Shrink_Cover(covers[0], 0);
+            }
+            function middle_shrink_left () {
+                Shrink_Cover(covers[1], (ELEMENT.WIDTH.SHRUNK + ELEMENT.OFFSET));
+            }
+            function middle_shrink_right () {
+                Shrink_Cover(covers[1], (ELEMENT.WIDTH.EXPANDED + ELEMENT.OFFSET));
+            }
+            function right_shrink () {
+                Shrink_Cover(covers[2], (ELEMENT.WIDTH.EXPANDED + ELEMENT.WIDTH.SHRUNK + (ELEMENT.OFFSET * 2)));
+            }
+            function left_expand () {
+                Expand_Cover(covers[0], 0);
+                middle_shrink_right();
+                right_shrink();
+            }
+            function middle_expand () {
+                left_shrink();
+                Expand_Cover(covers[1], (ELEMENT.WIDTH.SHRUNK + ELEMENT.OFFSET));
+                right_shrink();
+            }
+            function right_expand () {
+                left_shrink();
+                middle_shrink_left();
+                Expand_Cover(covers[2], ((ELEMENT.WIDTH.SHRUNK + ELEMENT.OFFSET) * 2));
+            }
+            function select () {
+                switch(hover_state){
+                case HOVER_STATES.LEFT:
+                    left_expand();
+                    break;
+                case HOVER_STATES.MIDDLE:
+                    middle_expand();
+                    break;
+                case HOVER_STATES.RIGHT:
+                    right_expand();
+                    break;
+                default:
+                    break;
+                }
+            }
+
+            document.onmousemove = function (event) {
+                mouse_x = event.pageX * canvas.width  / parseInt(canvas.style.width);
+                mouse_y = event.pageY * canvas.height  / parseInt(canvas.style.height);
+                update_hover_state();
+                if(update_display_id == -1){
+                    Display_Foreground();
+                }
+            };
+
+            var update_display_id = -1;
+            var clear_interval_id = -1;
+            document.onclick = function () {
+                select();
+                update_display_id = setInterval(function(){
+                    Display_Foreground();
+                }, 10);
+                clear_interval_id = setInterval(function(){
+                    Display_Foreground();
+                    clearInterval(update_display_id);
+                    update_display_id = -1;
+                    clearInterval(clear_interval_id);
+                    clear_interval_id = -1;
+                }, transform_duration * 1000 + 100);   
+            };
+        </script>
+    </body>
+</html>
