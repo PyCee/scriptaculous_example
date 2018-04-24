@@ -384,7 +384,13 @@
             var update_display_id = -1;
             var clear_interval_id = -1;
             document.onclick = function () {
-                select();
+				    select();
+				    if(update_display_id != -1){
+				    clearInterval(update_display_id);
+				    }
+				    if(clear_interval_id != -1){
+				    clearInterval(clear_interval_id);
+				    }
                 update_display_id = setInterval(function(){
                     Display_Foreground();
                 }, 10);
