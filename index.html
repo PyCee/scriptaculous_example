@@ -29,6 +29,7 @@
             canvas.style.height = window.innerHeight + "px";
 
             const ELEMENT = {
+	        HEIGHT: canvas.height * 0.9,
                 WIDTH: {
                     DEFAULT: canvas.width * 0.265,
                     EXPANDED: canvas.width * 0.7,
@@ -44,7 +45,7 @@
             const COVER_BOTTOM_OFFSET = ELEMENT.WIDTH.DEFAULT / 2;
 
             function Clear_Screen () {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.clearRect(0, 0, canvas.width, ELEMENT.HEIGHT * 1.001);
             }
             function Record_Screen () {
                 var im = new Image();
@@ -56,7 +57,7 @@
                 constructor (id, index, image) {
                     this.element = document.createElement("div");
                     this.element.style.display = "inline";
-                    this.element.height = canvas.height;
+                    this.element.height = ELEMENT.HEIGHT//canvas.height;
                     this.element.style.width = ELEMENT.WIDTH.DEFAULT + "px";
                     this.element.style.height = this.element.height + "px";
                     this.element.style.left = (index * (ELEMENT.WIDTH.DEFAULT + ELEMENT.OFFSET)) + "px";
@@ -91,11 +92,11 @@
                     ctx.restore();
                 }
             }
-            function Draw_Text (text, color, position_x, position_y, rotation) {
+            function Draw_Text (text, color, scale, position_x, position_y, rotation) {
                 ctx.save();
                 ctx.textBaseline = "hanging";
                 ctx.fillStyle = color;
-                ctx.font = (canvas.width * 0.03) + "px Arial Black";
+                ctx.font = (canvas.width * scale) + "px Arial Black";
                 ctx.translate(position_x, position_y);
                 ctx.rotate(rotation * Math.PI / 180);
                 ctx.fillText(text, 0, 0);
@@ -103,7 +104,7 @@
             }
             function Draw_Food (name, left, top) {
                 ctx.save();
-                Draw_Text(name, "#5522ff", left, top, 0);
+                Draw_Text(name, "#5522ff", 0.03, left, top, 0);
                 ctx.restore();
             }
             ctx.save();
@@ -136,9 +137,10 @@
             ctx.save();
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            Draw_Food("Ice cream", 2200, 500);
-            Draw_Food("Dessert Crepes", 2000, 1670);
-            Draw_Food("Churros", 2900, 1000);
+            Draw_Food("Ice Cream", 2100, 500);
+            Draw_Food("Dessert Crepes", 1500, 1700);
+            Draw_Food("Churros", 3100, 600);
+            Draw_Food("Dulce De Leche", 2500, 1400);
             var dessert_content = Record_Screen();
             Clear_Screen();
             ctx.restore();
@@ -239,24 +241,24 @@
                 }
                 ctx.restore();
 
-                var slope = -canvas.height / (ELEMENT.WIDTH.DEFAULT * 0.5);
+                var slope = -ELEMENT.HEIGHT / (ELEMENT.WIDTH.DEFAULT * 0.5);
                 var x = 1;
                 var y = x * slope;
                 var c = Math.sqrt(x * x + y * y);
                 x = x / c;
                 y = y / c;
                 var text_angle = Math.asin(y) * 180 / Math.PI;
-                Draw_Text("BREAKFAST", "#ffffff",
-                    covers[0].element.left + covers[0].element.width - COVER_BOTTOM_OFFSET * 0.925,
+                Draw_Text("BREAKFAST", "#ffffff", 0.03,
+                    covers[0].element.left + covers[0].element.width - COVER_BOTTOM_OFFSET * 0.97,
                     canvas.height * 0.7, text_angle);
-                Draw_Text("LUNCH", "#ffffff",
-                    covers[1].element.left - ELEMENT.WIDTH.DEFAULT * 0.3,
+                Draw_Text("LUNCH", "#ffffff", 0.03,
+                    covers[1].element.left - ELEMENT.WIDTH.DEFAULT * 0.33,
                     canvas.height * 0.6, text_angle);
-                Draw_Text("DINNER", "#ffffff",
-                    covers[2].element.left - ELEMENT.WIDTH.DEFAULT * 0.35,
+                Draw_Text("DINNER", "#ffffff", 0.03,
+                    covers[2].element.left - ELEMENT.WIDTH.DEFAULT * 0.38,
                     canvas.height * 0.7, text_angle);
-                Draw_Text("DESSERT", "#ffffff",
-                    covers[3].element.left - ELEMENT.WIDTH.DEFAULT * 0.35,
+                Draw_Text("DESSERT", "#ffffff", 0.03,
+                    covers[3].element.left - ELEMENT.WIDTH.DEFAULT * 0.38,
                     canvas.height * 0.7, text_angle);
                     
             }
@@ -380,6 +382,8 @@
                     Display_Foreground();
                 }
 	    };
+
+	    Draw_Text("The Kitchen: Open Weekdays 9:00am - 10:00pm", "#555555", 0.02, canvas.width * 0.2, canvas.height * 0.925, 0)
 				    
             var update_display_id = -1;
             var clear_interval_id = -1;
