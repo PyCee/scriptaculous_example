@@ -5,10 +5,14 @@
         <meta charset="utf-8">
         <title>Scriptaculous Example</title>
         <style>
+	    body {
+	        height: 100%;
+	    }
             canvas {
                 position: absolute;
                 top: 0px;
                 left: 0px;
+	        height: 90%;
                 background-color: white;
             }
         </style>
@@ -57,7 +61,7 @@
                 constructor (id, index, image) {
                     this.element = document.createElement("div");
                     this.element.style.display = "inline";
-                    this.element.height = ELEMENT.HEIGHT//canvas.height;
+                    this.element.height = ELEMENT.HEIGHT;
                     this.element.style.width = ELEMENT.WIDTH.DEFAULT + "px";
                     this.element.style.height = this.element.height + "px";
                     this.element.style.left = (index * (ELEMENT.WIDTH.DEFAULT + ELEMENT.OFFSET)) + "px";
@@ -112,7 +116,7 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             Draw_Food("French Toast", 1000, 200);
             Draw_Food("Waffles", 500, 1500);
-            Draw_Food("Pancakes", 200, 800);
+            Draw_Food("Hashbrowns", 200, 800);
             var breakfast_content = Record_Screen();
             Clear_Screen();
             ctx.restore();
@@ -383,8 +387,11 @@
                 }
 	    };
 
-	    Draw_Text("The Kitchen: Open Weekdays 9:00am - 10:00pm", "#555555", 0.02, canvas.width * 0.2, canvas.height * 0.925, 0)
-				    
+	    Draw_Text("The Kitchen - A dinner-table style restaraunt", "#555555",
+				    0.015, canvas.width * 0.3, canvas.height * 0.915, 0);
+	    Draw_Text("Open Weekdays 9:00am - 10:00pm", "#555555", 0.015,
+				    canvas.width * 0.35, canvas.height * 0.955, 0);
+	
             var update_display_id = -1;
             var clear_interval_id = -1;
             document.onclick = function () {
@@ -406,6 +413,6 @@
                     clear_interval_id = -1;
                 }, transform_duration * 1000 + 10);   
             };
-        </script>
+	</script>
     </body>
 </html>
