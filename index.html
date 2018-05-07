@@ -106,45 +106,69 @@
                 ctx.fillText(text, 0, 0);
                 ctx.restore();
             }
-            function Draw_Food (name, left, top) {
+            function Draw_Food (name, left, top, im=null) {
                 ctx.save();
-                Draw_Text(name, "#5522ff", 0.03, left, top, 0);
+                Draw_Text(name, "#552266", 0.03, left, top, 0);
                 ctx.restore();
             }
             ctx.save();
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            Draw_Food("French Toast", 1000, 200);
-            Draw_Food("Waffles", 500, 1500);
+            Draw_Food("Bacon & Eggs", 1550, 250);
+            Draw_Food("Baked Potatoes", 150, 300);
+            Draw_Food("French Toast", 1350, 650);
             Draw_Food("Hashbrowns", 200, 800);
+            Draw_Food("Omlette", 1800, 1000);
+            Draw_Food("Breakfast Bake", 400, 1175);
+            Draw_Food("Pancakes", 1100, 1450);
+            Draw_Food("Crepes", 1850, 1550);
+            Draw_Food("Waffles", 300, 1600);
             var breakfast_content = Record_Screen();
             Clear_Screen();
             ctx.restore();
             ctx.save();
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            Draw_Food("Sandwich", 1800, 200);
-            Draw_Food("Stir-fry", 1400, 700);
-            Draw_Food("Potato", 1900, 1300);
-            var lunch_content = Record_Screen();
+            Draw_Food("Caprese Salad", 900, 275);
+            Draw_Food("Pita Bread & Hummus", 1650, 550);
+            Draw_Food("Tortilla Soup", 2100, 1050);
+            Draw_Food("Chips & Salsa", 1800, 1400);
+            Draw_Food("Sandwich", 1550, 1650);
+            Draw_Food("Couscous", 500, 1600);
+            Draw_Food("Egg Drop Soup", 900, 900);
+            Draw_Food("Smoothies", 450, 1250);
+            var appetizer_content = Record_Screen();
             Clear_Screen();
             ctx.restore();
             ctx.save();
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            Draw_Food("Steak", 2200, 500);
-            Draw_Food("Pizza", 2000, 1670);
-            Draw_Food("?????", 2900, 1000);
+            Draw_Food("Oil or Cheese Fondue", 1350, 200);
+            Draw_Food("Burger", 1600, 500);
+            Draw_Food("Steak", 1950, 800);
+            Draw_Food("Potatoes al Gratin", 2400, 1200);
+            Draw_Food("Tacos", 1300, 950);
+            Draw_Food("Stir-fry", 2900, 900);
+            Draw_Food("Pasta & Meatballs", 2650, 500);
+            Draw_Food("Stromboli", 1200, 1300);
+            Draw_Food("Curry", 2150, 1400);
+            Draw_Food("Whole or Half Rack Ribs", 900, 1650);
+            Draw_Food("Pizza", 2750, 1650);
             var dinner_content = Record_Screen();
             Clear_Screen();
             ctx.restore();
             ctx.save();
             ctx.fillStyle = "#ffffff";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            Draw_Food("Ice Cream", 2100, 500);
+            Draw_Food("Chocolate Fondue", 2050, 250);
+            Draw_Food("Ice Cream", 2100, 600);
+            Draw_Food("Potitza", 1850, 950);
+            Draw_Food("Dulce De Leche", 2000, 1350);
             Draw_Food("Dessert Crepes", 1500, 1700);
-            Draw_Food("Churros", 3100, 600);
-            Draw_Food("Dulce De Leche", 2500, 1400);
+            Draw_Food("Cake", 3550, 150);
+            Draw_Food("Churros", 2900, 850);
+            Draw_Food("Brownies", 3250, 1150);
+            Draw_Food("Baked Alaska", 3050, 1600);
             var dessert_content = Record_Screen();
             Clear_Screen();
             ctx.restore();
@@ -161,7 +185,7 @@
             var breakfast_cover_color = Record_Screen();
             ctx.fillStyle = "#336688";
             ctx.fill();
-            var lunch_cover_color = Record_Screen();
+            var appetizer_cover_color = Record_Screen();
             ctx.fillStyle = "#003355";
             ctx.fill();
             var dinner_cover_color = Record_Screen();
@@ -174,7 +198,7 @@
             
             var covers = [
                 new Screen_Cover("left_cover", 0, breakfast_cover_color),
-                new Screen_Cover("left_middle_cover", 1, lunch_cover_color),
+                new Screen_Cover("left_middle_cover", 1, appetizer_cover_color),
                 new Screen_Cover("right_middle_cover", 2, dinner_cover_color),
                 new Screen_Cover("right_cover", 3, dessert_cover_color)
             ];
@@ -196,7 +220,7 @@
                 ctx.restore();
                 ctx.save();
                 covers[1].set_clip();
-                ctx.drawImage(lunch_content, 0, 0);
+                ctx.drawImage(appetizer_content, 0, 0);
                 ctx.restore();
                 ctx.save();
                 covers[2].set_clip();
@@ -206,7 +230,6 @@
                 covers[3].set_clip();
                 ctx.drawImage(dessert_content, 0, 0);
                 ctx.restore();
-                
 
                 // Draw semi-transparent covers over the content
                 covers[0].draw();
@@ -230,7 +253,7 @@
                     break;
                 case HOVER_STATES.LEFT_MIDDLE:
                     covers[1].set_clip();
-                    ctx.drawImage(lunch_content, 0, 0);
+                    ctx.drawImage(appetizer_content, 0, 0);
                     break;
                 case HOVER_STATES.RIGHT_MIDDLE:
                     covers[2].set_clip();
@@ -254,8 +277,8 @@
                 var text_angle = Math.asin(y) * 180 / Math.PI;
                 Draw_Text("BREAKFAST", "#ffffff", 0.03,
                     covers[0].element.left + covers[0].element.width - COVER_BOTTOM_OFFSET * 0.97,
-                    canvas.height * 0.7, text_angle);
-                Draw_Text("LUNCH", "#ffffff", 0.03,
+                    canvas.height * 0.67, text_angle);
+                Draw_Text("APPETIZERS", "#ffffff", 0.03,
                     covers[1].element.left - ELEMENT.WIDTH.DEFAULT * 0.33,
                     canvas.height * 0.6, text_angle);
                 Draw_Text("DINNER", "#ffffff", 0.03,
